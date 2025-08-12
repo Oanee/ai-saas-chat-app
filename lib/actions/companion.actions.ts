@@ -69,14 +69,12 @@ export const getCompanion = async (id: string) => {
 export const addToSessionHistory = async (companionId: string) => {
   const { userId } = await auth();
   const supabase = createSupabaseClient();
+  const { data, error } = await supabase.from("session_history").insert({
+    companion_id: companionId,
+    user_id: userId,
+  });
 
-  const { data, error } = await supabase
-    .from("session_history")
-    .insert({ companion_id: companionId, user_id: userId });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  if (error) throw new Error(error.message);
 
   return data;
 };
@@ -135,7 +133,7 @@ export const newCompanionPermissions = async () => {
 
   let limit = 0;
 
-  if (has({ plan: "pro" })) {
+  if (has({ plan: "pro_companion" })) {
     return true;
   } else if (has({ feature: "3_active_companions" })) {
     limit = 3;
